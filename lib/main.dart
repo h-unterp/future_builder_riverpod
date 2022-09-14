@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:future_builder_riverpod/future_widget.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -35,9 +37,10 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: const Center(
-        child: Text(
-          'You have pushed the button this many times:',
+      body: Center(
+        child: FutureWidget<String>(
+          Future<String>.delayed(
+              const Duration(seconds: 1), () => 'Hello World'),
         ),
       ),
       floatingActionButton: FloatingActionButton(

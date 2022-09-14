@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-typedef Thing<Tx> = Tx;
-
 class FutureWidget<Tx> extends ConsumerStatefulWidget {
-  const FutureWidget({Key? key}) : super(key: key);
+  final Future<Tx> future;
+  final StateNotifierProvider<FutureNotifier<Tx>, AsyncValue<Tx>> iapProvider =
+      StateNotifierProvider<FutureNotifier<Tx>, AsyncValue<Tx>>((ref) {
+    return FutureNotifier<Tx>();
+  });
+  FutureWidget(this.future, {Key? key}) : super(key: key);
 
   @override
   ConsumerState<FutureWidget> createState() => _FutureWidgetState();
 }
 
 class _FutureWidgetState<Tx> extends ConsumerState<FutureWidget> {
-  final iapProvider =
-      StateNotifierProvider<IAPNotifier<Tx>, AsyncValue<Tx>>((ref) {
-    return IAPNotifier();
-  });
+  @override
+  void initState() {
+    ref.read(widget.iapProvider.notifier).doWork(widget.future);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<Tx> iapWatch = ref.watch(iapProvider);
+    var iapWatch = ref.watch(widget.iapProvider);
     bool isLoading = iapWatch is AsyncLoading<void>;
     if (isLoading) {
       return const Center(
@@ -32,7 +36,10 @@ class _FutureWidgetState<Tx> extends ConsumerState<FutureWidget> {
   }
 }
 
-abstract class IAPNotifier<T> extends StateNotifier<AsyncValue<T>> {
-  IAPNotifier() : super(const AsyncValue.loading());
-  T doWork();
+class FutureNotifier<T> extends StateNotifier<AsyncValue<T>> {
+  FutureNotifier() : super(const AsyncValue.loading());
+  doWork(Future<T> future) async {
+    T ret = await future;
+    state = AsyncValue.data(ret);
+  }
 }

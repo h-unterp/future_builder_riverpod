@@ -1,3 +1,0 @@
-class FutureThings {
-  static getFutureActual() {}
-}
