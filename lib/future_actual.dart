@@ -1,0 +1,3 @@
+class FutureThings {
+  static getFutureActual() {}
+}
